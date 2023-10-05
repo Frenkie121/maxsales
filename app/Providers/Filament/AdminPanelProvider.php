@@ -30,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('')
             ->login(Login::class)
             ->colors([
-                'primary' => '#85878b',
+                'primary' => '#113766',
             ])
             // ->font()
             ->favicon(asset('images/favicon.ico'))
