@@ -17,10 +17,17 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->name();
+        $phone = '6' . fake()->randomElement(['5', '7', '8', '9']) . fake()->randomNumber(7, true);
+
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
+            'name' => $name,
+            'login' => strtoupper(substr(explode(' ', $name)[0], 0, 5)) . substr($phone, 0, 3),
+            'role_id' => fake()->randomElement([2, 3, 4, 5]),
+            'phone' => $phone,
+            'location' => fake()->city(),
+            'nic' => fake()->randomNumber(9, true),
+            'is_active' => fake()->boolean(60),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
         ];
