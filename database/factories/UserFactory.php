@@ -23,7 +23,6 @@ class UserFactory extends Factory
         return [
             'name' => $name,
             'login' => strtoupper(substr(explode(' ', $name)[0], 0, 5)) . substr($phone, 0, 3),
-            'role_id' => fake()->randomElement([2, 3, 4, 5]),
             'phone' => $phone,
             'location' => fake()->city(),
             'nic' => fake()->randomNumber(9, true),

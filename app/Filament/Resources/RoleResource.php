@@ -2,52 +2,55 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\StoreResource\Pages;
-use App\Filament\Resources\StoreResource\RelationManagers;
-use App\Models\Store;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Spatie\Permission\Models\Role;
+use Filament\Forms\Components\Section;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\RoleResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\RoleResource\RelationManagers;
+use Filament\Forms\Components\CheckboxList;
 
-class StoreResource extends Resource
+class RoleResource extends Resource
 {
-    protected static ?string $model = Store::class;
+    protected static ?string $model = Role::class;
 
-    // protected static ?string $navigationGroup = 'Configuration';
+    protected static ?string $navigationIcon = 'heroicon-o-cog';
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
+    protected static ?string $navigationGroup = 'Configuration';
 
-    // public static function getNavigationGroup() : string 
-    // {
-    //     return __('Configuration');
-    // }
+    protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup() : string 
+    {
+        return __('Configuration');
+    }
 
     public static function getNavigationLabel(): string
     {
-        return __('Stores');
+        return __('Roles');
     }
 
     public static function getModelLabel() : string 
     {
-        return __('Store');
+        return __('Role');
     }
 
     public static function getPluralModelLabel() : string 
     {
-        return __('Stores');
+        return __('Roles');
     }
 
-    // public static function createButtonLabel() : string
-    // {
-    //     return __('Create new');
-    // }
+    public static function getEloquentQuery() : Builder 
+    {
+        return parent::getEloquentQuery()->latest();
+    }
 
     public static function form(Form $form): Form
     {
@@ -59,7 +62,12 @@ class StoreResource extends Resource
                             ->translateLabel()
                             ->required()
                             ->unique(ignoreRecord: true),
-                    ])
+                        CheckboxList::make('Permissions')
+                            ->relationship('permissions', 'name')
+                            ->required()
+                            ->helperText(__('Select at least one item.'))
+                            ->columns(4)
+                    ]),
             ]);
     }
 
@@ -71,6 +79,7 @@ class StoreResource extends Resource
                     ->state(fn ($column) => $column->getRowLoop()->iteration),
                 TextColumn::make('name')
                     ->translateLabel()
+                    ->formatStateUsing(fn (string $state) : string => trans($state))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('created_at')
@@ -81,13 +90,14 @@ class StoreResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ]);
     }
     
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageStores::route('/'),
+            'index' => Pages\ManageRoles::route('/'),
         ];
-    }
+    }    
 }

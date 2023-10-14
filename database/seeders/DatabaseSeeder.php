@@ -14,14 +14,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             StoreSeeder::class,
-            RoleSeeder::class,
+            RolesAndPermissions::class,
         ]);
 
-        \App\Models\User::factory()->create([
-            'name' => 'Admin Max Sales',
-            'login' => 'ADMIN699',
-            'role_id' => 1
-        ]);
+        
         \App\Models\User::factory(9)->create();
     }
 }
