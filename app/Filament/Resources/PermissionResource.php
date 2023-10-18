@@ -22,13 +22,13 @@ class PermissionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-key';
 
-    protected static ?string $navigationGroup = 'Configuration';
+    protected static ?string $navigationGroup = 'Users Management';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function getNavigationGroup() : string 
     {
-        return __('Configuration');
+        return __('Users Management');
     }
 
     public static function getNavigationLabel(): string

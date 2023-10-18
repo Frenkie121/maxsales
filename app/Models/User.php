@@ -3,9 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -48,7 +51,31 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_active' => 'boolean'
     ];
+
+    // 
+    public function getRouteKeyName() : string
+    {
+        return 'slug';    
+    }
+
+    // MUTATORS
+    public function setLoginAttribute($value): void
+    {
+        $this->attributes['login'] = $value;
+        $this->attributes['slug'] = Str::slug($value);
+    }
+
+    // public function setPasswordAttribute($value): void
+    // {
+    //     $this->attributes['password'] = Hash::make($value);
+    // }
+
+    // public function password(): Attribute
+    // {
+    //     return Attribute::set(fn ($value) => Hash::make($value));
+    // }
 
     // RELATIONSHIPS
     /**

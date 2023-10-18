@@ -25,8 +25,7 @@ class Login extends AuthLogin
     protected function getLoginFormComponent(): Component 
     {
         return TextInput::make('login')
-            ->label(__('filament-panels::pages/auth/login.form.login.label'))
-            // ->translateLabel()
+            ->translateLabel()
             ->required()
             ->autocomplete()
             ->autofocus();

@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('login')->unique();
             $table->string('name');
+            $table->string('slug')->unique();
             $table->string('password');
             $table->string('phone');
             $table->string('location')->nullable();
             $table->string('nic')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->index('name');
+            $table->index(['name', 'login']);
             $table->rememberToken();
             $table->timestamps();
         });

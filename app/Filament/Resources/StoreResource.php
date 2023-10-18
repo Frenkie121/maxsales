@@ -20,14 +20,7 @@ class StoreResource extends Resource
 {
     protected static ?string $model = Store::class;
 
-    // protected static ?string $navigationGroup = 'Configuration';
-
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
-
-    // public static function getNavigationGroup() : string 
-    // {
-    //     return __('Configuration');
-    // }
 
     public static function getNavigationLabel(): string
     {
