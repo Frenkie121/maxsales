@@ -62,6 +62,8 @@ class AdminPanelProvider extends PanelProvider
                 FilamentLanguageSwitchPlugin::make(),
             ])
             // ->spa()
+            // ->collapsibleNavigationGroups(false)
+            ->sidebarCollapsibleOnDesktop()
             ;
     }
 }

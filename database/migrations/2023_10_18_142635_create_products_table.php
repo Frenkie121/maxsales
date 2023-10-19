@@ -21,10 +21,10 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->decimal('purchase_price');
             $table->decimal('sale_price');
-            $table->decimal('day_price');
-            $table->decimal('night_price');
-            $table->decimal('weekend_price');
-            $table->decimal('bonus');
+            $table->decimal('day_price')->nullable();
+            $table->decimal('night_price')->nullable();
+            $table->decimal('weekend_price')->nullable();
+            $table->decimal('bonus')->default(0);
             $table->timestamps();
         });
     }

@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Product;
+use Filament\Forms\Set;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
@@ -19,46 +21,113 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Products Management';
+
+    protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup() : string 
+    {
+        return __('Products Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Products');
+    }
+
+    public static function getModelLabel() : string 
+    {
+        return __('Product');
+    }
+
+    public static function getPluralModelLabel() : string 
+    {
+        return __('Products');
+    }
+
+    public static function getEloquentQuery() : Builder 
+    {
+        return parent::getEloquentQuery()->latest();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('created_by')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\Select::make('brand_id')
-                    ->relationship('brand', 'name')
-                    ->required(),
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'name')
-                    ->required(),
-                Forms\Components\Select::make('store_id')
-                    ->relationship('store', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('code')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('purchase_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('sale_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('day_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('night_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('weekend_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('bonus')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->translateLabel()
+                                    ->required()
+                                    ->unique(ignoreRecord: true)
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('code', generateProductCode($state))),
+                                Forms\Components\TextInput::make('code')
+                                    ->required()
+                                    ->unique(ignoreRecord: true)
+                                    // ->disabled()
+                                    ->dehydrated()
+                                    ->maxLength(255),
+                                Forms\Components\Select::make('brand_id')
+                                    ->relationship('brand', 'name')
+                                    ->translateLabel()
+                                    ->required()
+                                    ->columnSpanFull(),
+                                Forms\Components\Select::make('category_id')
+                                    ->relationship('category', 'name')
+                                    ->translateLabel()
+                                    ->required()
+                                    ->columnSpanFull(),
+                                Forms\Components\Select::make('store_id')
+                                    ->relationship('store', 'name')
+                                    ->translateLabel()
+                                    ->required()
+                                    ->columnSpanFull(),
+                            ])->columns(2),
+                        ]),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('purchase_price')
+                                    ->translateLabel()
+                                    ->required()
+                                    ->numeric()
+                                    ->columnSpanFull(),
+                                Forms\Components\TextInput::make('sale_price')
+                                    ->translateLabel()
+                                    // ->helperText(__('The default selling price'))
+                                    ->gte('purchase_price')
+                                    ->required()
+                                    ->numeric()
+                                    ->columnSpanFull(),
+                                Forms\Components\TextInput::make('day_price')
+                                    ->translateLabel()
+                                    ->nullable()
+                                    ->gte('purchase_price')
+                                    ->numeric(),
+                                Forms\Components\TextInput::make('night_price')
+                                    ->translateLabel()
+                                    ->nullable()
+                                    ->requiredWith('day_price')
+                                    ->gte('purchase_price')
+                                    ->numeric(),
+                                Forms\Components\TextInput::make('weekend_price')
+                                    ->translateLabel()
+                                    ->nullable()
+                                    ->gte('purchase_price')
+                                    ->numeric(),
+                                Forms\Components\TextInput::make('bonus')
+                                    ->translateLabel()
+                                    ->nullable()
+                                    ->lt('purchase_price')
+                                    ->default(0)
+                                    ->numeric(),
+                    ])->columns(2)
+                ])
             ]);
     }
 
@@ -66,60 +135,100 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('brand.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('store.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->translateLabel()
+                    // ->cap
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code')
+                    ->translateLabel()
+                    ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('creator.name')
+                    ->label(__('Created by'))
+                    ->badge()
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('brand.name')
+                    ->translateLabel()
+                    ->badge()
+                    ->color('info')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->translateLabel()
+                    ->badge()
+                    ->color('warning')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('store.name')
+                    ->translateLabel()
+                    ->badge()
+                    ->color('gray')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('purchase_price')
-                    ->numeric()
+                    ->translateLabel()
+                    ->money('XAF')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('sale_price')
-                    ->numeric()
+                    ->translateLabel()
+                    ->money('XAF')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('day_price')
-                    ->numeric()
-                    ->sortable(),
+                    ->translateLabel()
+                    ->money('XAF')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('night_price')
-                    ->numeric()
-                    ->sortable(),
+                    ->translateLabel()
+                    ->money('XAF')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('weekend_price')
-                    ->numeric()
-                    ->sortable(),
+                    ->translateLabel()
+                    ->money('XAF')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('bonus')
-                    ->numeric()
+                    ->translateLabel()
+                    ->money('XAF')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->translateLabel()
+                    ->dateTime('d-M, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->translateLabel()
+                    ->dateTime('d-M, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('brand')
+                    ->translateLabel()
+                    ->relationship('brand', 'name'),
+                SelectFilter::make('category')
+                    ->translateLabel()
+                    ->relationship('category', 'name'),
+                SelectFilter::make('store')
+                    ->translateLabel()
+                    ->relationship('store', 'name'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            // ->bulkActions([
+            //     Tables\Actions\BulkActionGroup::make([
+            //         Tables\Actions\DeleteBulkAction::make(),
+            //     ]),
+            // ])
+            ;
     }
     
     public static function getRelations(): array

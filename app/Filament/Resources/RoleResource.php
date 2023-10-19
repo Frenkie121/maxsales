@@ -76,7 +76,7 @@ class RoleResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('#')
-                    ->state(fn ($column) => $column->getRowLoop()->iteration),
+                    ->rowIndex(),
                 TextColumn::make('name')
                     ->translateLabel()
                     ->formatStateUsing(fn (string $state) : string => trans($state))

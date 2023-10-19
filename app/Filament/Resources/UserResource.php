@@ -88,7 +88,7 @@ class UserResource extends Resource
                         ->tel()
                         ->unique(ignoreRecord: true)
                         ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
-                        ->startsWith(['65', '67', '68', '69'])
+                        ->startsWith(['65', '67', '68', '69', '222', '233', '242'])
                         ->required()
                         ->length(9)
                         ->maxLength(255),

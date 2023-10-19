@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo};
 
 class Product extends Model
@@ -11,6 +12,13 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'code', 'purchase_price', 'sale_price', 'day_price', 'night_price', 'weekend', 'bonus', 'store_id', 'category_id', 'brand_id', 'created_by'];
+
+    public function getRouteKeyName() : string
+    {
+        return 'code';    
+    }
+
+    // MUTATORS
 
     // RELATIONSHIPS
     public function brand() : BelongsTo

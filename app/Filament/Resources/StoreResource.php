@@ -61,7 +61,7 @@ class StoreResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('#')
-                    ->state(fn ($column) => $column->getRowLoop()->iteration),
+                    ->rowIndex(),
                 TextColumn::make('name')
                     ->translateLabel()
                     ->sortable()
