@@ -52,6 +52,7 @@ class CategoryResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->translateLabel()
+                            ->unique(ignoreRecord: true)
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description')
@@ -71,6 +72,7 @@ class CategoryResource extends Resource
                     ->rowIndex(),
                 Tables\Columns\TextColumn::make('name')
                     ->translateLabel()
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('description')
                     ->words(10)
