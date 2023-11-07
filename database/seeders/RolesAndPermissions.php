@@ -70,12 +70,16 @@ class RolesAndPermissions extends Seeder
 
         User::factory()->create([
             'name' => 'Manager Max Sales',
-            'login' => 'Manager023',
+            'login' => 'MANAGER688',
         ])->assignRole($manager);
 
         User::factory()->create([
             'name' => 'Accountant Max Sales',
-            'login' => 'Accountant023',
+            'login' => 'ACCOUNTANT233',
         ])->assignRole($accountant);
+        
+        $users = \App\Models\User::factory(9)
+            ->create();
+        $users->each(fn ($user) => $user->assignRole(fake()->randomElement([$cashier, $server])));
     }
 }

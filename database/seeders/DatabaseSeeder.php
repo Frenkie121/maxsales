@@ -17,8 +17,5 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissions::class,
             ProductSeeder::class,
         ]);
-
-        
-        \App\Models\User::factory(9)->create();
     }
 }

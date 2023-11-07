@@ -145,7 +145,7 @@ class UserResource extends Resource
                     ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('roles.name')
-                    ->label(__('Role(s)'))
+                    ->label(__('Role'))
                     ->listWithLineBreaks(false)
                     ->badge()
                     ->limitList(3)
