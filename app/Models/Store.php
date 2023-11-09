@@ -41,9 +41,13 @@ class Store extends Model
         return $this->belongsToMany(User::class);
     }
 
-    // RELATIONSHIPS
     public function products() : HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    function inventories() : HasMany
+    {
+        return $this->hasMany(Inventory::class);
     }
 }
